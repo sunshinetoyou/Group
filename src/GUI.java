@@ -11,6 +11,7 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Scanner;
 
 
@@ -159,9 +160,9 @@ public class GUI extends JFrame {
         clear_txt(birthday);
 
         // 연락처를 입력받습니다.
-        JTextField phoneNumber = new JTextField("전화번호(-제외)", 15);
-        center.add(phoneNumber);
-        clear_txt(phoneNumber);
+        JTextField phone_number = new JTextField("전화번호(-제외)", 15);
+        center.add(phone_number);
+        clear_txt(phone_number);
 
         // 주소를 입력받습니다.
         JTextField address = new JTextField("거주중인 주소", 30);
@@ -281,7 +282,7 @@ public class GUI extends JFrame {
                     warning.setSize(400, 10);
                     warning.setTitle("생년월일 정보를 입력하세요.");
                     warning.setVisible(true);
-                } else if (phoneNumber.getText().length() <10){
+                } else if (phone_number.getText().length() <10){
                     JFrame warning = new JFrame();
                     warning.setSize(400, 10);
                     warning.setTitle("핸드폰 번호를 입력하세요.");
@@ -296,13 +297,13 @@ public class GUI extends JFrame {
                     //그룹명, 회원 이름, 백신 접종 여부, 음성 확인서 여부, 시작 시간, 종료 시간, 생년월일, 핸드폰 번호, 주소
                     member[0] = groupname.getText();
                     member[1] = person_name.getText();
-                    member[2] = check_list[0];
-                    member[3] = check_list[1];
-                    member[4] = starttime.getText();
-                    member[5] = endtime.getText();
-                    member[6] = birthday.getText();
-                    member[7] = phoneNumber.getText();
-                    member[8] = address.getText();
+                    member[2] = birthday.getText();
+                    member[3] = address.getText();
+                    member[4] = phone_number.getText();
+                    member[5] = check_list[0];
+                    member[6] = check_list[1];
+                    member[7] = starttime.getText();
+                    member[8] = endtime.getText();
                     group.add(new GroupMember(member));
 
                     // 텍스트 초기화
@@ -324,7 +325,7 @@ public class GUI extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 // 그룹 정보 파일 만들기
-                // 양식 : 그룹명, 대표자명
+                // 양식 : 그룹명, 대표자명(, 비밀번호<추가 시>)
                 String group_name = group.get(0).getGroupName();
                 String agent_name = group.get(0).getPersonName();
                 try (FileWriter fw = new FileWriter("그룹정보.txt", true)){ // 이어쓰기
@@ -334,7 +335,7 @@ public class GUI extends JFrame {
                 }
 
                 // 회원 정보 파일 만들기
-                // 양식 : 그룹명, 회원 이름, 백신 접종 여부, 음성 확인서 여부, 시작 시간, 종료 시간, 생년월일, 주소
+                // 양식 : 그룹명,이름,생년월일,연락처,주소,백신접종,음성확인서,시작시간,종료시간
                 try (FileWriter fw = new FileWriter(group.get(0).getGroupName() + ".txt", false)){ // 덮어쓰기
                     for (GroupMember member : group) {
                         for (int i = 0; i < member.all_info.length; i++) {
@@ -413,7 +414,9 @@ public class GUI extends JFrame {
         JLabel endtime = new JLabel("이용 종료 시간: ");
         north.add(endtime);
 
+        // 그룹원 정보 출력과 관련한 기능입니다.
         // 그룹이름, 대표자 이름, 비밀번호가 일치하면 버튼을 눌렀을때 그룹원들의 정보를 조회가 가능하게 합니다.
+        // 백신 접종 여부가 false 일 경우에는 음성 확인서 접종 여부 확인
         JButton BTN_show_information = new JButton();
         BTN_show_information.setText("조회하기");
         BTN_show_information.setSize(30,30);
@@ -426,26 +429,25 @@ public class GUI extends JFrame {
                 String lname = leadername.getText();
                 String pw = password.getText();
 
-                //빈 칸이 있을 경우
+                // 빈 칸이 있을 경우
                 if (gname.length() < 1){
                     JFrame warning = new JFrame();
                     warning.setSize(400, 10);
                     warning.setTitle("그룹명을 입력하세요.");
                     warning.setVisible(true);
-                } else if(lname.length() < 1){
+                } else if (lname.length() < 1){
                     JFrame warning = new JFrame();
                     warning.setSize(400, 10);
                     warning.setTitle("대표자 이름을 입력하세요.");
                     warning.setVisible(true);
-                } else if(pw.length() < 4){
+                } else if (pw.length() != 4){
                     JFrame warning = new JFrame();
                     warning.setSize(400, 10);
-                    warning.setTitle("비밀번호를 입력하세요.");
+                    warning.setTitle("비밀번호를 제대로 입력하세요.");
                     warning.setVisible(true);
                 } else {
                     // 파일 읽어와서 그룹정보 txt 파일과 비교
-                    try (FileInputStream input = new FileInputStream(gname+".txt")){
-                        //TODO 함수화
+                    try (FileInputStream input = new FileInputStream(gname+".txt")) {
                         Scanner group_info = new Scanner(input);
 
                         ArrayList <String[]> tmp_members = new ArrayList<>();
@@ -453,22 +455,16 @@ public class GUI extends JFrame {
                             String[] line = group_info.nextLine().split(",");
                             tmp_members.add(line);
                         }
-                        // 테스트 출력
-//                        for (String[] member : members) {
-//                            for (String s : member) {
-//                                System.out.println(s);
-//                            }
-//                        }
+
                         // arrayList -> array 변환
                         String[] header = {"이름", "생년월일", "연락처", "주소", "백신 접종", "음성 확인서"};
                         String[][] members = new String[tmp_members.size()][header.length];
 
                         for (int i = 0; i < tmp_members.size(); i++) {
-                            for (int j = 0; j < header.length; j++) {
-                                members[i][j] = tmp_members.get(i)[j];
-                            }
+                            System.arraycopy(tmp_members.get(i), 1, members[i], 0, header.length);
                         }
 
+                        // GUI 구성
                         starttime.setText(starttime.getText() + members[0][4]);
                         endtime.setText(endtime.getText() + members[0][5]);
 
@@ -505,19 +501,13 @@ public class GUI extends JFrame {
                         print.setPreferredSize(new Dimension(800, 100));
                         center.add(print);
                     } catch (FileNotFoundException fileNotFoundException) {
-                        fileNotFoundException.printStackTrace();
+                        infoFrame.setTitle("파일을 찾을 수 없습니다.");
                     } catch (IOException ioException) {
                         ioException.printStackTrace();
                     }
                 }
             }
         });
-
-
-        // 그룹원 정보 출력과 관련한 기능입니다.
-        // 현재는 예시 데이터로 입력되어 있습니다. 이차원 배열의 형태로 값을 불러오도록 해주세요!!
-
-        // 백신 접종 여부가 O일 경우에는 음성 확인서 접종 여부
 
         // GUI 하단에 대한 기능입니다.
         JButton BTN_end_information = new JButton();

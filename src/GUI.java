@@ -308,7 +308,9 @@ public class GUI extends JFrame {
                     // 텍스트 초기화
                     person_name.setText("그룹원 이름");
                     birthday.setText("생년 월일 6자리를 입력하세요.");
+                    phoneNumber.setText("핸드폰 번호를 입력하세요.");
                     address.setText("거주중인 주소를 입력하세요.");
+
                 }
             }
         });
@@ -464,13 +466,21 @@ public class GUI extends JFrame {
                         String[][] members = new String[tmp_members.size()][header.length];
 
                         for (int i = 0; i < tmp_members.size(); i++) {
-                            for (int j = 0; j < header.length; j++) {
-                                members[i][j] = tmp_members.get(i)[j];
-                            }
+//                            for (int j = 0; j < header.length; j++) {
+//                                members[i][j] = tmp_members.get(i)[j];
+//                            }
+
+                            members[i][0] = tmp_members.get(i)[1];
+                            members[i][1] = tmp_members.get(i)[6];
+                            members[i][2] = tmp_members.get(i)[7];
+                            members[i][3] = tmp_members.get(i)[8];
+                            members[i][4] = tmp_members.get(i)[2];
+                            members[i][5] = tmp_members.get(i)[3];
+
                         }
 
-                        starttime.setText(starttime.getText() + members[0][4]);
-                        endtime.setText(endtime.getText() + members[0][5]);
+                        starttime.setText(starttime.getText() + tmp_members.get(0)[4]);
+                        endtime.setText(endtime.getText() + tmp_members.get(0)[5]);
 
                         DefaultTableModel model = new DefaultTableModel(members, header);
                         JTable showMembers = new JTable(model);

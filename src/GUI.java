@@ -612,6 +612,13 @@ public class GUI extends JFrame {
         BTN_cancel.setSize(30,30);
         center.add(BTN_cancel);
 
+        // 삭제하기 취소 버튼 클릭 이벤트
+        BTN_cancel.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                deleteFrame.dispose();
+            }
+        });
         // 삭제하기 버튼 클릭 이벤트
         BTN_delete.addActionListener(new ActionListener() {
             @Override
@@ -619,45 +626,25 @@ public class GUI extends JFrame {
                 String gname = groupname.getText();
                 String lname = leadername.getText();
                 String pw = password.getText();
-                int index = 0;
 
-                try{
+
+                try {
                     FileInputStream fileInputStream = new FileInputStream("그룹정보.txt");
                     Scanner sc = new Scanner(fileInputStream);
 
-                    while(sc.hasNextLine()){
-                        String[] group_line = sc.nextLine().split(",");
-                        if(group_line[0] == gname && group_line[1] == lname){
+                    FileWriter fileWriter = new FileWriter("그룹정보.txt",true);
 
-                            //그룹정보 txt에서 해당 그룹정보 삭제
+                    int index = 0;
 
-                            //그룹 파일 삭제
+                    while (sc.hasNextLine()) {
+                        String nextLine = sc.nextLine();
+                        String[] group_line = nextLine.split(",");
 
+                        if (group_line[0].equals(gname) && group_line[1].equals(lname)) {
 
-
-                        }
-                    }
-
-
-
-
-
-
-
-
-                    // fileinputstream, scanner line 입력 받기 수정
-                    FileReader fileReader = new FileReader("그룹정보.txt");
-                    BufferedReader bufferedReader = new BufferedReader(fileReader);
-
-                    String line = "";
-                    while((line = bufferedReader.readLine()) != null){
-                        String[] part = line.split(",");
-                        // groupMember로 변환
-                        // GroupMember gm = new GroupMember(line.split(","));
-                        // gm.getName();
-                        if(gname.equals(part[0]) && lname.equals(part[1])){
+                            //진짜로 삭제할지 물어보는 JFrame
                             JFrame deleteCheckFrame = new JFrame();
-                            deleteCheckFrame.setSize(280,110);
+                            deleteCheckFrame.setSize(280, 110);
                             deleteCheckFrame.setTitle("그룹 삭제");
                             Container delCheckCon = deleteCheckFrame.getContentPane();
                             delCheckCon.setLayout(new BorderLayout());
@@ -672,19 +659,27 @@ public class GUI extends JFrame {
                             really.setFont(new Font("gothic", Font.BOLD, 20));
                             center.add(really);
 
+                            //네 버튼
                             JButton BTN_yes = new JButton("네");
-                            BTN_yes.setSize(30,30);
+                            BTN_yes.setSize(30, 30);
                             center.add(BTN_yes);
                             BTN_yes.addActionListener(new ActionListener() {
                                 @Override
                                 public void actionPerformed(ActionEvent e) {
                                     deleteCheckFrame.dispose();
                                     deleteFrame.dispose();
-                                    // 파일이 삭제되는 코드를 추가해주세요!!
-                                    String filename = gname + ".txt";
-                                    //그룹 정보 파일 읽고
+
+                                    //그룹정보 txt에서 해당 그룹정보 삭제
                                     try {
-                                        Files.delete(Path.of(filename));
+                                        fileWriter.write(nextLine);
+                                    } catch (IOException ex) {
+                                        ex.printStackTrace();
+                                    }
+
+                                    //그룹 파일 삭제
+                                    String delete_file = gname + ".txt";
+                                    try {
+                                        Files.delete(Path.of(delete_file));
                                     } catch (IOException ex) {
                                         ex.printStackTrace();
                                     }
@@ -692,8 +687,9 @@ public class GUI extends JFrame {
                                 }
                             });
 
+                            //아니요 버튼
                             JButton BTN_no = new JButton("아니오");
-                            BTN_no.setSize(30,30);
+                            BTN_no.setSize(30, 30);
                             center.add(BTN_no);
                             BTN_no.addActionListener(new ActionListener() {
                                 @Override
@@ -702,15 +698,15 @@ public class GUI extends JFrame {
                                 }
                             });
                             deleteCheckFrame.setVisible(true);
-                            break;
 
-                        }else{
-                            index ++;
+                        }else {
+                            index++;
                             deleteFrame.setTitle("입력 " + index + "회 오류입니다.");
                             groupname.setText("그룹 이름");
                             leadername.setText("대표자 이름");
                             password.setText("비밀번호 4자리");
                         }
+
                     }
 
                 } catch (FileNotFoundException fileNotFoundException) {
@@ -718,68 +714,8 @@ public class GUI extends JFrame {
                 } catch (IOException ioException) {
                     ioException.printStackTrace();
                 }
-
-
-                //
-                // 조건문으로 삭제 조건(그룹 이름, 대표자 이름, 비밀번호가 모두 맞는지를 확인하는 코드 작성 부탁드립니다!!
-                //
-                // 조건이 틀렸다면 아래의 코드를 실행해주세요. index 추가 코드도 작성해주세요.
-//                deleteFrame.setTitle("입력 " + index + "회 오류입니다.");
-//                groupname.setText("그룹 이름");
-//                leadername.setText("대표자 이름");
-//                password.setText("비밀번호 4자리");
-                // 조건이 맞았다면 아래의 코드를 실행해주세요.
-                JFrame deleteCheckFrame = new JFrame();
-                deleteCheckFrame.setSize(280,110);
-                deleteCheckFrame.setTitle("그룹 삭제");
-                Container delCheckCon = deleteCheckFrame.getContentPane();
-                delCheckCon.setLayout(new BorderLayout());
-                delCheckCon.setBackground(Color.lightGray);
-
-                JPanel center = new JPanel();
-                center.setBackground(Color.lightGray);
-                delCheckCon.add(center, BorderLayout.CENTER);
-
-                JLabel really = new JLabel("정말 삭제하시겠습니까?");
-                really.setSize(280, 50);
-                really.setFont(new Font("gothic", Font.BOLD, 20));
-                center.add(really);
-
-                JButton BTN_yes = new JButton("네");
-                BTN_yes.setSize(30,30);
-                center.add(BTN_yes);
-                BTN_yes.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        deleteCheckFrame.dispose();
-                        deleteFrame.dispose();
-                        //
-                        // 파일이 삭제되는 코드를 추가해주세요!!
-                        //
-                    }
-                });
-
-                JButton BTN_no = new JButton("아니오");
-                BTN_no.setSize(30,30);
-                center.add(BTN_no);
-                BTN_no.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        deleteCheckFrame.dispose();
-                    }
-                });
-                deleteCheckFrame.setVisible(true);
             }
-        });
-
-        // 삭제 취소 버튼을 누를시 그룹 삭제 창이 사라지게 하는 액션리스너
-        BTN_cancel.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                deleteFrame.dispose();
-            }
-        });
-
+            });
 
         deleteFrame.setVisible(true);
     }

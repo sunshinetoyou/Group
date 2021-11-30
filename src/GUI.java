@@ -293,16 +293,19 @@ public class GUI extends JFrame {
                     warning.setVisible(true);
                 } else {
                     String[] member = new String[9];
-                    //그룹명, 회원 이름, 백신 접종 여부, 음성 확인서 여부, 시작 시간, 종료 시간, 생년월일, 핸드폰 번호, 주소
+                    //그룹명,이름,생년월일,연락처,주소,백신접종,음성확인서,시작시간,종료시간
                     member[0] = groupname.getText();
                     member[1] = person_name.getText();
-                    member[2] = check_list[0];
-                    member[3] = check_list[1];
-                    member[4] = starttime.getText();
-                    member[5] = endtime.getText();
-                    member[6] = birthday.getText();
-                    member[7] = phoneNumber.getText();
-                    member[8] = address.getText();
+                    member[2] = birthday.getText();
+                    member[3] = phoneNumber.getText();
+                    member[4] = address.getText();
+                    member[5] = check_list[0];
+                    member[6] = check_list[1];
+                    member[7] = starttime.getText();
+                    member[8] = endtime.getText();
+
+
+
                     group.add(new GroupMember(member));
 
                     // 텍스트 초기화
@@ -466,21 +469,13 @@ public class GUI extends JFrame {
                         String[][] members = new String[tmp_members.size()][header.length];
 
                         for (int i = 0; i < tmp_members.size(); i++) {
-//                            for (int j = 0; j < header.length; j++) {
-//                                members[i][j] = tmp_members.get(i)[j];
-//                            }
-
-                            members[i][0] = tmp_members.get(i)[1];
-                            members[i][1] = tmp_members.get(i)[6];
-                            members[i][2] = tmp_members.get(i)[7];
-                            members[i][3] = tmp_members.get(i)[8];
-                            members[i][4] = tmp_members.get(i)[2];
-                            members[i][5] = tmp_members.get(i)[3];
-
+                            for (int j = 0; j < header.length; j++) {
+                                members[i][j] = tmp_members.get(i)[j+1];
+                            }
                         }
 
-                        starttime.setText(starttime.getText() + tmp_members.get(0)[4]);
-                        endtime.setText(endtime.getText() + tmp_members.get(0)[5]);
+                        starttime.setText(starttime.getText() + tmp_members.get(0)[7]);
+                        endtime.setText(endtime.getText() + tmp_members.get(0)[8]);
 
                         DefaultTableModel model = new DefaultTableModel(members, header);
                         JTable showMembers = new JTable(model);
@@ -624,9 +619,32 @@ public class GUI extends JFrame {
                 String gname = groupname.getText();
                 String lname = leadername.getText();
                 String pw = password.getText();
+                int index = 0;
 
                 try{
-                    int index = 0;
+                    FileInputStream fileInputStream = new FileInputStream("그룹정보.txt");
+                    Scanner sc = new Scanner(fileInputStream);
+
+                    while(sc.hasNextLine()){
+                        String[] group_line = sc.nextLine().split(",");
+                        if(group_line[0] == gname && group_line[1] == lname){
+
+                            //그룹정보 txt에서 해당 그룹정보 삭제
+
+                            //그룹 파일 삭제
+
+
+
+                        }
+                    }
+
+
+
+
+
+
+
+
                     // fileinputstream, scanner line 입력 받기 수정
                     FileReader fileReader = new FileReader("그룹정보.txt");
                     BufferedReader bufferedReader = new BufferedReader(fileReader);

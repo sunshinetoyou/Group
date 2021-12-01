@@ -978,6 +978,10 @@ public class GUI extends JFrame {
         BTN_deleteProcess.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                String pname = personName.getText();
+                String pphone = personPhone.getText();
+                logic.updateMember(last_group_name,pname,pphone);
+
                 ////////////////////////////////////////////////////////////////////////////
                 // 그룹원 한 명을 파일에서 완전히 삭제해주세요.
                 // 추가가 완료 된 이후, 이 주석들은 모두 삭제해주세요.

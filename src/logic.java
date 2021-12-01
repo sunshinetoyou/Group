@@ -226,9 +226,38 @@ public void deleteMemberinfo(String gname){
         }
 }
 
-//아니오 버튼 눌렀을 경우
-public void btn_no(){
+    //아니오 버튼 눌렀을 경우
+    public void btn_no(){
 
+    }
+
+    public void updateMember(String gname, String Name, String Phone){
+        String new_member_info = "";
+        String groupName = gname + ".txt";
+        try(FileInputStream input = new FileInputStream(groupName)){
+            Scanner sc = new Scanner(input);
+
+            while (sc.hasNextLine()){
+                String nextLine = sc.nextLine();
+                String[] Member =  nextLine.split(",");
+
+                if(!(Member[0].equals(Name) && Member[2].equals(Phone))){
+                    new_member_info += nextLine + "\n";
+                }
+            }
+
+            try( FileWriter fileWriter = new FileWriter(groupName,false)){
+                fileWriter.write(new_member_info);
+            }
+
+
+
+        }catch (FileNotFoundException e){
+            e.printStackTrace();
+        }catch (IOException e ){
+            e.printStackTrace();
         }
+    }
+
 
 }

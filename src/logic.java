@@ -2,6 +2,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Objects;
 import java.util.Scanner;
@@ -152,5 +154,46 @@ public class Logic {
         }
         return members;
     }
+    //그룹 파일 삭제
+    public void deleteMemberinfo(String gname){
+        String groupName = gname + ".txt";
+        try {
+            Files.delete(Path.of(groupName));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    //그룹 정보 파일에서 삭제
+    public void deleteGroupinfo(String gname){
+        String newGroupinfo = "";
+        try(FileInputStream input = new FileInputStream("그룹정보.txt")){
+
+                Scanner sc = new Scanner(input);
+
+                while (sc.hasNextLine()){
+                    String nextLine = sc.nextLine();
+                    String[] splitLine = nextLine.split(",");
+
+                    if(splitLine[0] != gname){
+                        newGroupinfo += nextLine + "\n";
+                    }
+                }
+
+            try( FileWriter fileWriter = new FileWriter("그룹정보.txt",false)){
+                fileWriter.write(newGroupinfo);
+            }
+        }catch(FileNotFoundException e){
+            e.printStackTrace();
+        }catch (IOException e ){
+            e.printStackTrace();
+        }
+    }
+
+    //아니오 버튼 눌렀을 경우
+    public void btn_no(){
+
+    }
+
 
 }

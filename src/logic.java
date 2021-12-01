@@ -96,14 +96,14 @@ public class Logic {
                 }
                 fw.write("\r\n");
             }
-        }catch(Exception err){
+        } catch(Exception err){
             err.printStackTrace();
         }
     }
 
     // 그룹 정보 조회하기
     String[] group_info;
-    public String[] searchGroupInfo(String group_name, String password) {
+    public String[] getGroupInfo(String group_name, String password) {
         try (FileInputStream input = new FileInputStream("그룹정보.txt")) {
             Scanner group_txt = new Scanner(input);
 
@@ -125,7 +125,7 @@ public class Logic {
 
     // 회원 정보 조회하기
     String[][] members;
-    public String[][] searchMemberInfo(String group_name, String[] header) {
+    public String[][] getMemberInfo(String group_name, String[] header) {
         try (FileInputStream input = new FileInputStream(group_name+".txt")) {
             Scanner group_info = new Scanner(input);
 

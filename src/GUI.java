@@ -82,12 +82,18 @@ public class GUI extends JFrame {
         BTN_accept.setSize(30, 30);
         center.add(BTN_accept);
 
-        // 조건문 형식으로 입력한 정보와 일치하는지 판단 후에 일치하다면 group_main 화면 출력하는 기능 구현 필요
         BTN_accept.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                func_gui();
-                dispose();
+                // 그룹 정보 파일 대조
+                try {
+                    String[] line = logic.getGroupInfo(group_name.getText(), password.getText());
+
+                    func_gui();
+                    dispose();
+                } catch (NullPointerException err) {
+                    setTitle("그룹 정보를 제대로 입력하세요.");
+                }
             }
         });
         setVisible(true);
@@ -571,7 +577,7 @@ public class GUI extends JFrame {
     //그룹 정보 조회
     public void group_information() {
         JFrame infoFrame = new JFrame();
-        infoFrame.setSize(800, 400);
+        infoFrame.setSize(800, 800);
         infoFrame.setTitle("그룹 정보를 입력하세요!");
 
         Container infoContainer = infoFrame.getContentPane();
@@ -645,13 +651,14 @@ public class GUI extends JFrame {
                 } else {
                     // 파일 읽어와서 회원 정보를 2차원 문자열 배열로 생성
                     String[] header = {"이름", "생년월일", "연락처", "주소", "백신 접종", "음성 확인서"};
-                    String[][] members = logic.searchMemberInfo(group_name.getText(), header);
-                    String[] times = Arrays.copyOfRange(logic.searchGroupInfo(group_name.getText(), password.getText()), 1, 4);
-
+                    String[][] members = logic.getMemberInfo(group_name.getText(), header);
+                    
                     // 시간 정보
+                    String[] times = Arrays.copyOfRange(logic.getGroupInfo(group_name.getText(), password.getText()), 1, 4);
                     starttime.setText(starttime.getText() + times[0]);
                     endtime.setText(endtime.getText() + times[1]);
-
+                    
+                    // 표 정보
                     DefaultTableModel model = new DefaultTableModel(members, header);
                     JTable showMembers = new JTable(model);
                     showMembers.setPreferredScrollableViewportSize(new Dimension(800, 200));

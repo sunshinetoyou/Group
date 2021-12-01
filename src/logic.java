@@ -3,6 +3,7 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.Scanner;
 
@@ -122,6 +123,24 @@ public class Logic {
 
         return group_info;
     }
+    
+    // 이용시간 정보 가져오기
+    String[] time_info;
+    public String[] getTimeInfo(String group_name) {
+        try (FileInputStream input = new FileInputStream("그룹정보.txt")) {
+            Scanner group_txt = new Scanner(input);
+
+            while (group_txt.hasNextLine()) {
+                time_info = Arrays.copyOfRange(group_txt.nextLine().split(","), 1, 3);
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return time_info;
+    }
 
     // 회원 정보 조회하기
     String[][] members;
@@ -153,4 +172,17 @@ public class Logic {
         return members;
     }
 
+    // 대표자명 가져오기
+    String agent_name;
+    public String getAgent_name(String group_name) {
+        try (FileInputStream input = new FileInputStream(group_name+".txt")) {
+            Scanner lines = new Scanner(input);
+            agent_name = lines.nextLine().split(",")[0];
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return agent_name;
+    }
 }

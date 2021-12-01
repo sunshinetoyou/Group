@@ -13,7 +13,11 @@ import java.util.Scanner;
 
 public class GUI extends JFrame {
 
-    String lastGroupname;
+    Logic logic = new Logic();
+    String last_group_name;
+    String last_agent_name;
+
+
     public void main_gui() {
         setSize(300, 200);
         setTitle("초기 화면 수정");
@@ -59,10 +63,10 @@ public class GUI extends JFrame {
         });
 
         // 그룹 이름을 입력받습니다.
-        JTextField groupname = new JTextField("그룹 이름", 10);
-        groupname.setHorizontalAlignment(JTextField.CENTER);
-        center.add(groupname);
-        clear_txt(groupname);
+        JTextField group_name = new JTextField("그룹 이름", 10);
+        group_name.setHorizontalAlignment(JTextField.CENTER);
+        center.add(group_name);
+        clear_txt(group_name);
 
 
         // 대표자 이름을 입력받습니다.
@@ -86,11 +90,28 @@ public class GUI extends JFrame {
         center.add(BTN_accept);
 
         // 조건문 형식으로 입력한 정보와 일치하는지 판단 후에 일치하다면 group_main 화면 출력하는 기능 구현 필요
+//        BTN_accept.addActionListener(new ActionListener() {
+//            @Override
+//            public void actionPerformed(ActionEvent e) {
+//                func_gui();
+//                dispose();
+//            }
+//        });
+
         BTN_accept.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                func_gui();
-                dispose();
+                // 그룹 정보 파일 대조
+                try {
+                    String[] line = logic.getGroupInfo(group_name.getText(), password.getText());
+                    last_group_name = line[0];
+                    last_agent_name = logic.getAgent_name(group_name.getText());
+
+                    func_gui();
+                    dispose();
+                } catch (NullPointerException err) {
+                    setTitle("그룹 정보를 다시 입력하세요.");
+                }
             }
         });
 
@@ -536,36 +557,16 @@ public class GUI extends JFrame {
         BTN_endAddgroup.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // 그룹 정보 파일 만들기
-                // 양식 : 그룹명, 대표자명
-                String group_name = group.get(0).getGroupName();
-                String agent_name = group.get(0).getPersonName();
-                try (FileWriter fw = new FileWriter("그룹정보.txt", true)){ // 이어쓰기
-                    fw.write(group_name + "," + agent_name + "\r\n");
-                }catch(Exception err){
-                    err.printStackTrace();
-                }
-
                 // 회원 정보 파일 만들기
-                // 양식 : 그룹명, 회원 이름, 백신 접종 여부, 음성 확인서 여부, 시작 시간, 종료 시간, 생년월일, 주소
-                try (FileWriter fw = new FileWriter(group.get(0).getGroupName() + ".txt", false)){ // 덮어쓰기
-                    for (GroupMember member : group) {
-                        for (int i = 0; i < member.all_info.length; i++) {
-                            if (i == member.all_info.length -1)
-                                fw.write(member.all_info[i]);
-                            else
-                                fw.write(member.all_info[i]+",");
-                        }
-                        fw.write("\r\n");
-                    }
-                }catch(Exception err){
-                    err.printStackTrace();
-                }
+                // 양식 : 이름,생년월일,연락처,주소,백신접종,음성확인서
+                logic.createMemberInfo(groupname.getText(), group);
 
                 // 창 닫기
                 addFrame.dispose();
                 main_gui();
             }
+
+
         });
 
         addContainer.setVisible(true);
@@ -946,9 +947,6 @@ public class GUI extends JFrame {
     // 그룹 삭제를 담당하는 함수
     public void group_delete() {
 
-        Logic lg = new Logic;
-
-
         ////////////////////////////////////////////////////////////////////////////
         // 기존에는 삭제 버튼을 클릭하면 여러 입력을 받고 확인을 받아 삭제하도록 하였습니다.
         // 이제는 그룹 삭제 기능으로 넘어가면 확인창만 받고 삭제합니다.
@@ -1069,8 +1067,8 @@ public class GUI extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                lg.deleteGroupinfo();
-                lg.deleteMemberinfo();
+                logic.deleteGroupinfo(last_group_name);
+                logic.deleteMemberinfo(last_group_name);
 
                 ////////////////////////////////////////////////////////////////////////////
                 // 삭제 기능을 여기다가 구현하시면 됩니다.
@@ -1087,7 +1085,7 @@ public class GUI extends JFrame {
         BTN_no.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                lg.btn_no();
+                logic.btn_no();
                 deleteCheckFrame.dispose();
                 func_gui();
 

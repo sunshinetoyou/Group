@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.Scanner;
 
@@ -125,6 +126,24 @@ class Logic {
         return group_info;
     }
 
+    // 이용시간 정보 가져오기
+    String[] time_info;
+    public String[] getTimeInfo(String group_name) {
+        try (FileInputStream input = new FileInputStream("그룹정보.txt")) {
+            Scanner group_txt = new Scanner(input);
+
+            while (group_txt.hasNextLine()) {
+                time_info = Arrays.copyOfRange(group_txt.nextLine().split(","), 1, 3);
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return time_info;
+    }
+
     // 회원 정보 조회하기
     String[][] members;
     public String[][] getMemberInfo(String group_name, String[] header) {
@@ -168,48 +187,48 @@ class Logic {
         }
         return agent_name;
     }
-    //그룹 파일 삭제
-    public void deleteMemberinfo(String gname){
+
+//그룹 파일 자체를 삭제
+public void deleteMemberinfo(String gname){
         String groupName = gname + ".txt";
         try {
-            Files.delete(Path.of(groupName));
+        Files.delete(Path.of(groupName));
         } catch (IOException e) {
-            e.printStackTrace();
+        e.printStackTrace();
         }
-    }
+        }
 
-    //그룹 정보 파일에서 삭제
+//그룹 정보 파일에서 삭제
     public void deleteGroupinfo(String gname){
+
         String newGroupinfo = "";
         try(FileInputStream input = new FileInputStream("그룹정보.txt")){
 
-            Scanner sc = new Scanner(input);
+        Scanner sc = new Scanner(input);
 
-            while (sc.hasNextLine()){
-                String nextLine = sc.nextLine();
-                String[] splitLine = nextLine.split(",");
+        while (sc.hasNextLine()){
+        String nextLine = sc.nextLine();
+        String[] splitLine = nextLine.split(",");
 
-                if(splitLine[0] != gname){
-                    newGroupinfo += nextLine + "\n";
-                }
+            if(!splitLine[0].equals(gname)){
+                newGroupinfo += nextLine + "\n";
             }
+        }
 
-            try( FileWriter fileWriter = new FileWriter("그룹정보.txt",false)){
+        try( FileWriter fileWriter = new FileWriter("그룹정보.txt",false)){
                 fileWriter.write(newGroupinfo);
             }
+
         }catch(FileNotFoundException e){
             e.printStackTrace();
         }catch (IOException e ){
             e.printStackTrace();
         }
-    }
-
-    //아니오 버튼 눌렀을 경우
-    public void btn_no(){
-
-    }
-
-
 }
 
+//아니오 버튼 눌렀을 경우
+public void btn_no(){
 
+        }
+
+}

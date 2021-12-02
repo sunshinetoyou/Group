@@ -2,6 +2,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Objects;
@@ -169,31 +171,88 @@ public class Logic {
                     members[i][j] = tmp_members.get(i)[j];
                 }
             }
-        } catch (FileNotFoundException fileNotFoundException) {
-//            infoFrame.setTitle("파일을 찾을 수 없습니다.");
-            // throw Error
-        } catch (IOException ioException) {
-            ioException.printStackTrace();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
         return members;
     }
 
     // 대표자명 가져오기
     String agent_name;
-    public String getAgent_name(String group_name) {
+    public String getAgent_name(String group_name) throws FileNotFoundException {
         try (FileInputStream input = new FileInputStream(group_name+".txt")) {
             Scanner lines = new Scanner(input);
             agent_name = lines.nextLine().split(",")[0];
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
         return agent_name;
     }
 
-    // 회원 삭제 기능
-    public void deleteMemeber() {
+    //그룹 파일 자체를 삭제
+    public void deleteMemberinfo(String gname){
+        String groupName = gname + ".txt";
+        try {
+            Files.delete(Path.of(groupName));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    //그룹 정보 파일에서 삭제
+    public void deleteGroupinfo(String gname){
 
+        String newGroupinfo = "";
+        try(FileInputStream input = new FileInputStream("그룹정보.txt")){
+
+            Scanner sc = new Scanner(input);
+
+            while (sc.hasNextLine()){
+                String nextLine = sc.nextLine();
+                String[] splitLine = nextLine.split(",");
+
+                if(!splitLine[0].equals(gname)){
+                    newGroupinfo += nextLine + "\n";
+                }
+            }
+
+            try( FileWriter fileWriter = new FileWriter("그룹정보.txt",false)){
+                fileWriter.write(newGroupinfo);
+            }
+
+        }catch(FileNotFoundException e){
+            e.printStackTrace();
+        }catch (IOException e ){
+            e.printStackTrace();
+        }
+    }
+
+    // 그룹 수정하기
+    public void updateMember(String gname, String Name, String Phone){
+        String new_member_info = "";
+        String groupName = gname + ".txt";
+        try(FileInputStream input = new FileInputStream(groupName)){
+            Scanner sc = new Scanner(input);
+
+            while (sc.hasNextLine()){
+                String nextLine = sc.nextLine();
+                String[] Member =  nextLine.split(",");
+
+                // 조건 틀림
+                if(!(Member[0].equals(Name) && Member[2].equals(Phone))){
+                    new_member_info += nextLine + "\n";
+                }
+            }
+
+            try( FileWriter fileWriter = new FileWriter(groupName,false)){
+                fileWriter.write(new_member_info);
+            }
+
+        }catch (FileNotFoundException e){
+            e.printStackTrace();
+        }catch (IOException e ){
+            e.printStackTrace();
+        }
     }
 }

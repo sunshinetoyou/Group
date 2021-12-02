@@ -96,6 +96,8 @@ public class GUI extends JFrame {
 
                     func_gui();
                     dispose();
+                } catch (FileNotFoundException err) {
+                    setTitle("지정된 파일을 찾을 수 없습니다.");
                 } catch (NullPointerException err) {
                     setTitle("그룹 정보를 다시 입력하세요.");
                 }
@@ -884,12 +886,10 @@ public class GUI extends JFrame {
         BTN_yes.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                ////////////////////////////////////////////////////////////////////////////
-                // 삭제 기능을 여기다가 구현하시면 됩니다.
-                // 추가가 완료 된 이후, 이 주석들은 모두 삭제해주세요.
-                ////////////////////////////////////////////////////////////////////////////
+                logic.deleteGroupinfo(last_group_name);
+                logic.deleteMemberinfo(last_group_name);
                 deleteCheckFrame.dispose();
-                func_gui();
+                main_gui();
             }
         });
 

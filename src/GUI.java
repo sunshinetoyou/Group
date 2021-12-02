@@ -2,6 +2,7 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumnModel;
+import javax.swing.table.TableModel;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
@@ -14,6 +15,7 @@ public class GUI extends JFrame {
     Logic logic = new Logic();
     String last_group_name;
     String last_agent_name;
+    String[] header = {"이름", "생년월일", "연락처", "주소", "백신 접종", "음성 확인서"};
 
     public void main_gui() {
         setSize(300, 200);
@@ -606,13 +608,9 @@ public class GUI extends JFrame {
         JLabel endtime = new JLabel("이용 종료 시간: "+ logic.getTimeInfo(last_group_name)[1]);
         north.add(endtime);
 
-        String[] header = {"이름", "생년월일", "연락처", "주소", "백신 접종", "음성 확인서"};
         String[][] members = logic.getMemberInfo(last_group_name, header);
-        for(String[] s: members) {
-            for (String k : s) {
-                System.out.println(k);
-            }
-        }
+
+
         DefaultTableModel model = new DefaultTableModel(members, header);
         JTable showMembers = new JTable(model);
         showMembers.setPreferredScrollableViewportSize(new Dimension(800, 200));
@@ -687,16 +685,11 @@ public class GUI extends JFrame {
         modiContainer.add(south, BorderLayout.SOUTH);
 
         // GUI 상단에 대한 기능입니다. : 그룹 이름, 이용 시작 시간, 이용 종료 시간
-        ////////////////////////////////////////////////////////////////////////////
-        // group_name과 starttime, endtime의 정보를 파일에서 불러와주세요.
-        // 00 그룹, 10:00, 19:00 이 적혀 있는 부분에 추가해주시면 됩니다.
-        // 추가가 완료 된 이후, 이 주석들은 모두 삭제해주세요.
-        ////////////////////////////////////////////////////////////////////////////
         JLabel group_nameInfo = new JLabel("그룹 이름 : ", 10);
         group_nameInfo.setSize(10,20);
         north.add(group_nameInfo);
 
-        JLabel group_name = new JLabel("OO 그룹", 10);
+        JLabel group_name = new JLabel(last_group_name, 10);
         group_name.setSize(10,20);
         north.add(group_name);
 
@@ -704,28 +697,18 @@ public class GUI extends JFrame {
         timeInfo.setSize(10,20);
         north.add(timeInfo);
 
-        JLabel starttime = new JLabel("10:00");
+        JLabel starttime = new JLabel(logic.getTimeInfo(last_group_name)[0]);
         north.add(starttime);
 
         JLabel justShow = new JLabel(" ~ ", 10);
         justShow.setSize(5,20);
         north.add(justShow);
 
-        JLabel endtime = new JLabel("19:00");
+        JLabel endtime = new JLabel(logic.getTimeInfo(last_group_name)[1]);
         north.add(endtime);
 
         // GUI 중앙에 대한 기능입니다. : 그룹원 정보 출력
-        ////////////////////////////////////////////////////////////////////////////
-        // test data입니다. 파일에서 불러와 주세요.
-        // 추가가 완료 된 이후, 이 주석들은 모두 삭제해주세요.
-        ////////////////////////////////////////////////////////////////////////////
-        String[] header = {"이름", "생년월일", "연락처", "주소", "백신 접종", "음성 확인서"};
-        String[][] members = {{"김단국", "020202", "01012345678", "단국대", "O", "해당 사항X"},
-                {"김단국", "020202", "01012345678", "단국대", "O", "해당 사항X"},
-                {"김단국", "020202", "01012345678", "단국대", "O", "해당 사항X"},
-                {"김단국", "020202", "01012345678", "단국대", "O", "해당 사항X"},
-                {"김단국", "020202", "01012345678", "단국대", "O", "해당 사항X"},
-                {"김단국", "020202", "01012345678", "단국대", "O", "해당 사항X"}};
+        String[][] members = logic.getMemberInfo(last_group_name, header);
 
         DefaultTableModel model = new DefaultTableModel(members, header);
         JTable showMembers = new JTable(model);
@@ -758,9 +741,9 @@ public class GUI extends JFrame {
         print.setPreferredSize(new Dimension(800, 100));
         center.add(print);
 
-        // GUI 하단에 대한 기능입니다. : 수정 완료 버튼
+        // GUI 하단에 대한 기능입니다.
         JButton BTN_deletePerson = new JButton();
-        BTN_deletePerson.setText("그룹원 한 명 탈퇴");
+        BTN_deletePerson.setText("회원 삭제");
         BTN_deletePerson.setSize(200,30);
         south.add(BTN_deletePerson, BorderLayout.EAST);
         BTN_deletePerson.addActionListener(new ActionListener() {
@@ -780,11 +763,26 @@ public class GUI extends JFrame {
         BTN_end_modify.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                ArrayList<String> updatedMembers = new ArrayList<>();
+                TableModel model = showMembers.getModel();
+                for(int idx=0; idx<model.getRowCount(); idx++) {
+                    String rows = "";
+
+                    for(int cdx=0; cdx<model.getColumnCount(); cdx++) {
+                        Object val = model.getValueAt(idx, cdx);
+                        if (rows.length() < 1) {
+                            rows = rows + val;
+                        } else {
+                            rows = rows + "," + val;
+                        }
+                    }
+                    updatedMembers.add(rows);
+                }
+                logic.createMemberInfo2(last_group_name, updatedMembers);
                 modiFrame.dispose();
                 func_gui();
             }
         });
-
         modiFrame.pack();
         modiFrame.setVisible(true);
         modiFrame.requestFocusInWindow();
@@ -831,10 +829,13 @@ public class GUI extends JFrame {
         BTN_deleteProcess.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                ////////////////////////////////////////////////////////////////////////////
-                // 그룹원 한 명을 파일에서 완전히 삭제해주세요.
-                // 추가가 완료 된 이후, 이 주석들은 모두 삭제해주세요.
-                ////////////////////////////////////////////////////////////////////////////
+                ArrayList<String[]> dummy = new ArrayList<>();
+                String[][] members = logic.getMemberInfo(last_group_name, header);
+                for(String[] s : members) {
+                    if (!Objects.equals(personName.getText(), s[0]) && !Objects.equals(personPhone.getText(), s[2]))
+                        dummy.add(s);
+                }
+                logic.createMemberInfo3(last_group_name, dummy);
                 deletePeople.dispose();
                 group_modify();
             }
@@ -947,11 +948,11 @@ public class GUI extends JFrame {
         JLabel endtime = new JLabel("이용 마침 시간 : ");
         north.add(endtime);
 
-        ////////////////////////////////////////////////////////////////////////////
+        //////////////////////////////////////////////////////////////////////
         // 현행 규정과 통계 관련해서 코드를 모두 작성하고 변수에 알맞게 대입해주세요.
         // 모임이 가능한지와 불가능한지 또한 판정하는 코드를 작성 후 변수에 대입해주세요.
         // 추가가 완료 된 이후, 이 주석들은 모두 삭제해주세요.
-        ////////////////////////////////////////////////////////////////////////////
+        ///////////////////////////////////////////////////////////////////////
 
         //아래 str1에 현행 규정 입력하기 <br>은 줄바꿈 문자임
         String str1 = "================현행규정================<br>"+ "거리두기 ~~단계<br>"+"운영시간 - 제한 없음<br>"+ "테이블간 거리두기 ~~~<br>"+ "최대 ~인 제한<br>";
@@ -979,7 +980,7 @@ public class GUI extends JFrame {
         // test data입니다. 파일에서 불러와 주세요.
         // 추가가 완료 된 이후, 이 주석들은 모두 삭제해주세요.
         ////////////////////////////////////////////////////////////////////////////
-        String[] header = {"이름", "생년월일", "연락처", "주소", "백신 접종", "음성 확인서"};
+
         String[][] members = {{"김단국", "020202", "01012345678", "단국대", "O", "해당 사항X"},
                 {"김단국", "020202", "01012345678", "단국대", "O", "해당 사항X"},
                 {"김단국", "020202", "01012345678", "단국대", "O", "해당 사항X"},

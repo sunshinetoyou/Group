@@ -45,27 +45,6 @@ class GroupMember {
         return negative_check;
     }
 
-    // 회원 정보 수정
-    // 수정한 내용을 가져가도록 해야함
-    public void updatePersonName(String new_person_name) { 
-        person_name = new_person_name; 
-    }
-    public void updateBirth(String new_birth) { 
-        birth = new_birth; 
-    }
-    public void updatePhoneNumber(String new_phone_number) {
-        phone_number = new_phone_number;
-    }
-    public void updateAddress(String new_address) { 
-        address = new_address; 
-    }
-    public void updateVaccine(Boolean new_vaccine) { 
-        vaccine = new_vaccine; 
-    }
-    public void updateNegativeCheck(Boolean new_negative_check) { 
-        negative_check = new_negative_check; 
-    }
-
     // 회원 정보 삭제
     /* 이 기능은 클래스 밖에서 해야함 */
 }
@@ -94,6 +73,33 @@ public class Logic {
                         fw.write(member.all_info[i]);
                     else
                         fw.write(member.all_info[i]+",");
+                }
+                fw.write("\r\n");
+            }
+        } catch(Exception err){
+            err.printStackTrace();
+        }
+    }
+
+    public void createMemberInfo2(String group_name, ArrayList<String> members) {
+        try (FileWriter fw = new FileWriter(group_name + ".txt", false)){ // 덮어쓰기
+            for (String member : members) {
+                fw.write(member);
+                fw.write("\r\n");
+            }
+        } catch(Exception err){
+            err.printStackTrace();
+        }
+    }
+
+    public void createMemberInfo3(String group_name, ArrayList<String[]> members) {
+        try (FileWriter fw = new FileWriter(group_name + ".txt", false)){ // 덮어쓰기
+            for (String[] member : members) {
+                for (int i = 0; i < member.length; i++) {
+                    if (i == member.length -1)
+                        fw.write(member[i]);
+                    else
+                        fw.write(member[i]+",");
                 }
                 fw.write("\r\n");
             }
@@ -184,5 +190,10 @@ public class Logic {
             e.printStackTrace();
         }
         return agent_name;
+    }
+
+    // 회원 삭제 기능
+    public void deleteMemeber() {
+
     }
 }
